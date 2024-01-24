@@ -1,0 +1,22 @@
+{
+  "name": "2--desafio-entregable-29-11-23",
+  "version": "1.0.0",
+  "main": "ProductManager.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
+    "mongoose": "^8.1.0",
+    "socket.io": "^4.7.2"
+  },
+  "description": ""
+}
