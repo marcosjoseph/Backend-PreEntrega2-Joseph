@@ -16,7 +16,7 @@ dotenv.config();
 
 //Creo y conecto el puerto
 const app = express();
-const PORT = process.env.PORT || 3000; //Por lo que veo, no me conecta el puerto desde .env.
+const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`)
 })
@@ -24,9 +24,7 @@ const server = app.listen(PORT, () => {
 // const productManager = new ProductManager("./archivosJson/productos.json");
 
 // // //Conecto mi BD de Mongoose
-// const DB_URL = process.env.DB_URL;
-
-const DB_URL="mongodb+srv://Coder:Coder1992%21@cluster0.betcr48.mongodb.net/"; // Lo escribi acá porque no me engancha el DB_URL desde .env. Me da un error: "Error en la conexion de la base de datos MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string."
+const DB_URL = process.env.DB_URL;
 
 mongoose.connect(DB_URL).then(()=> {console.log("Base de Datos conectada:" + DB_URL);
 }).catch((error)=>{console.log("Error en la conexion de la base de datos", error);})

@@ -1,16 +1,47 @@
 import {Router} from "express";
 // import {ProductManager} from "../classes/ProductManager.js";
 import Products from "../dao/dbManagers/products.js";
+import {ProductModel} from "../dao/models/products.model.js";
 
 const router = Router();
 
 const products = new Products();
 
 router.get("/", async (req, res) => {
-    try {
-        const result = await products.getAll();
-        res.json(result)
-    } catch (error) {console.log("Error al buscar los productos:" + error)}
+    const {limit, page, query, sort} = req.query;
+
+    const isSorted = () => { if(sort.toLowerCase() === "asc") {return 1
+    } else if (sort.toLowerCase() === "desc") {return -1} }
+
+    const parsedQuery = () => { if (query) {
+        const queryObj = JSON.parse(query);
+        return queryObj;}
+        return {};}
+
+    const options = await ProductModel.paginate(parsedQuery(), {
+        limit: limit || 10,
+        page: page || 1,
+        sort: sort ? {price:isSorted()} : null,
+        lean: true,
+    })
+
+    const {docs,hasPrevPage,hasNextPage,totalPages,prevPage, nextPage} = options
+
+    const products = docs;
+    products.forEach((product) => {console.log(product.nombre)})
+
+    res.render("products", {
+        products,hasPrevPage,hasNextPage,prevPage,nextPage
+    })
+
+    // try {
+    //     const result = await products.paginate({},
+    //         {
+    //             limit: limit || 10,
+    //             page: page || 1
+    //         })
+    //     res.json(result)
+    // } catch (error) {console.log("Error al buscar los productos:" + error)}
 })
 
 router.get("/:id", async (req, res) => {
