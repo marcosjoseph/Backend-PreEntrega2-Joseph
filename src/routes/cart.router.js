@@ -1,10 +1,13 @@
 import {Router} from "express";
-// import {CartManager} from "../classes/CartManager.js";
 import Carts from "../dao/dbManagers/carts.js";
+import Products from "../dao/dbManagers/products.js";
+import {ProductModel} from "../dao/models/products.model.js";
+import {CartModel} from "../dao/models/carts.model.js";
 
 const router = Router();
 
 const carts = new Carts();
+const productsCRUD = new Products();
 
 router.get("/", async (req, res) => {
     try{
@@ -13,12 +16,17 @@ router.get("/", async (req, res) => {
     } catch(error) {console.log("Error al traer los Carts:" + error)}
 })
 
-router.get("/:id", async (req, res) => {
-    const {id} = req.params;
+router.get("/:cid", async (req, res) => {
+    const {cid} = req.params;
 
     try{
-        const result = await carts.getById(id);
-        res.json(result);
+        const result = await carts.getById(cid);
+        console.log(result);
+        res.render("carts", {
+            carts: result._id.toString(),
+            products:result.products,
+            style:"/css/cart.css"
+        });
     } catch(error) {console.log("Error al traer el Cart:" + req.params + "," + error)}
 })
 
@@ -29,58 +37,85 @@ router.post("/", async (req, res) => {
     } catch (error) {console.log("Error al crear nuevo Cart:" + error)}
 })
 
-router.delete("/:id", async (req, res) => {
-    const {id} = req.params;
+router.put("/:cid/product/:pid", async (req, res) => {
+    const {cid, pid} = req.params;
+    
+
+    const isCartValid = await carts.getById(cid);
+    const isProductValid = await productsCRUD.getById(pid)
+    let hasChange = false;
+
+    const newProduct = {
+        product: pid,
+        quantity:1
+    };
+
+    if (!isCartValid || !isProductValid) {
+        return res.status(400).json({
+            status:"error",
+            message:"Cart o Producto o encontrado"
+        })}
+
+        (item) => item.product.equals(pid)
+
+    if(productIndex === -1) {
+        isCartValid.products.push(newProduct);
+        hasChange = true} else {
+        isCartValid.products[productIndex].quantity++;
+        hasChange = true}
+
+    if(hasChange) {
+        const result = await carts.updateCart(cid,{products: isCartValid.products});
+        res.json({
+            status:"ok",
+            message: isCartValid
+        })
+    }
+})
+
+router.delete("/:cid", async (req, res) => {
+    const {cid} = req.params;
 
     try{
-        const result = await carts.deleteCart(id);
+        const result = await carts.deleteCart(cid);
         res.json(result);
     } catch(error) {console.log("Error al eliminar el Cart:" + req.params + "," + error)}
 })
 
-// const cartManager = new CartManager("./archivosJson/carts.json");
+router.delete("/:cid/product/:pid", async (req, res) => {
+    const {cid, pid} = req.params;
 
-// router.get("/", async (req, res) => {
-//     try {
-//         let cartProducts = await cartManager.getCarts();
-//         res.json({data:cartProducts});
-//     } catch (error) {console.log(error)}
-// })
+    const isCartValid = await carts.getById(cid);
+    const isProductValid = await productsCRUD.getById(pid)
+    let hasChange = false;
 
-// router.get("/:cid", async (req, res) => {
-//     const {cid} = req.params;
+    if (!isCartValid || !isProductValid) {
+        return res.status(400).json({
+            status:"error",
+            message:"Cart o Producto no encontrado"
+        })}
 
-//     let cart = await cartManager.getCartById(cid);
+    const productIndex = isCartValid.products.findIndex(
+        (product) => product.product.equals(pid))
 
-//     if (cart) {
-//         res.json({ message: "success", data: cart });
-//         } else {
-//         res.json({
-//             message: "El carrito solicitado no existe",
-//         })
-//         }
-//     });
+    if(productIndex === -1) {
+            res.status(400).json({
+            status:"error",
+            message:"Producto no encontrado"
+        }) } else {
+            isCartValid.products[productIndex].quantity--;
+        if (isCartValid.products[productIndex].quantity === 0) {
+            isCartValid.products.splice(productIndex,1)
+        }
+        hasChange = true}
 
-// router.post("/", async (req, res) => {
-//     try {
-//         let createCart = await cartManager.addCart();
-//         res.json({message:"Carrito Creado", data:createCart});
-//     } catch (error) {
-//         res.status(500).json({message:"Error al crear el Carrito", data:error})
-//     }
-// })
-
-// router.post("/:cid/products/:pid", async (req, res) => {
-//     const {cid, pid} = req.params;
-
-//     try {
-//         const response = await cartManager.addProductToCart(cid, pid);
-//         res.json({message:`Producto Agregado Correctamente al Carrito ${cid}`, data:response})
-//     } catch (error) {
-//         res.status(500).json({message:"Error al agregar producto", data:error})
-//     }
-
-// }
-// )
+    if(hasChange) {
+        const result = await carts.updateCart(cid,{products: isCartValid.products});
+        res.json({
+            status:"ok",
+            message: isCartValid
+        })
+    }
+})
 
 export default router;

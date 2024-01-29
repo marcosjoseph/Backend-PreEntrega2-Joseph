@@ -9,7 +9,6 @@ import productsRouter from "./routes/products.router.js";
 import cartRouter from "./routes/cart.router.js";
 import viewsRouter from "./routes/views.router.js";
 import {__dirname} from "./utils.js";
-// import {ProductManager} from "./classes/ProductManager.js";
 
 //Inicializo dotenv para proteger mis datos sensibles
 dotenv.config();
@@ -20,8 +19,6 @@ const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`)
 })
-
-// const productManager = new ProductManager("./archivosJson/productos.json");
 
 // // //Conecto mi BD de Mongoose
 const DB_URL = process.env.DB_URL;
@@ -38,9 +35,10 @@ app.engine("handlebars", handlebars.engine());
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 
-app.use("/api/products", productsRouter); //Conecto las routes
-app.use("/api/cart", cartRouter);
-app.use("/", viewsRouter)
+//Conecto las routes
+app.use("/api/products", productsRouter); //le pongo api para poder manejar el crud
+app.use("/api/carts", cartRouter);
+app.use("/", viewsRouter) //aca renderizo las vistas de los handlebars
 
 const socketServer = new Server(server);
 

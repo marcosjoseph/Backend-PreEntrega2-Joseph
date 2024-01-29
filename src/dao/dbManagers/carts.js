@@ -8,8 +8,8 @@ export default class Carts {
         return carts;
     }
 
-    async getById(id) {
-        let cart = await CartModel.findById(id).lean();
+    async getById(cid) {
+        let cart = await CartModel.findById(cid).lean();
         return cart;
     }
 
@@ -19,13 +19,13 @@ export default class Carts {
         return result;
     }
 
-    async updateCart(id, cart) {
-        const result = await CartModel.updateOne({_id:id}, cart);
+    async updateCart(cid, cart) {
+        const result = await CartModel.updateOne({_id:cid}, cart);
         return result;
     }
 
-    async deleteCart(id) {
-        const result = await CartModel.findByIdAndDelete(id);
+    async deleteCart(cid) {
+        const result = await CartModel.findByIdAndDelete(cid);
         return result;
     }
 }

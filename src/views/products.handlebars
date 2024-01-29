@@ -14,4 +14,13 @@
         </div>
     </div>
     {{/each}}
+    <div>
+        {{#if hasPrevPage}}
+            <a class="prev" href="/api/products?page={{prevPage}}"><button>Anterior</button></a>
+        {{/if}}
+
+        {{#if hasNextPage}}
+            <a class="next" href="/api/products?page={{nextPage}}"><button>Siguiente</button></a>
+        {{/if}}
+    </div>
 </div>
